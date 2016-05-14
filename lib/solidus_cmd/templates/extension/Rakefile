@@ -11,7 +11,7 @@ begin
 
   RuboCop::RakeTask.new
 
-  task default: %i(first_run rubocop spec)
+  task default: %i(first_run set_devise_secret_key rubocop spec)
 rescue LoadError
   # no rspec available
 end
@@ -27,4 +27,17 @@ desc 'Generates a dummy app for testing'
 task :test_app do
   ENV['LIB_NAME'] = '<%=file_name%>'
   Rake::Task['extension:test_app'].invoke
+end
+
+desc 'Generates a devise secret key for the dummy app'
+task :set_devise_secret_key do
+  path = 'spec/dummy/config/initializers'
+  file_path = path + '/devise.rb'
+
+  unless File.exist?(file_path)
+    FileUtils.mkdir_p(path)
+    File.open(file_path, 'w') do |file|
+      file.write("Devise.secret_key = '454360bb1e74cc798944b7defda59b291a40b376e71b48c2b1615134859400af0ebdbd841460e8f5992d152fb55444d29f79'\n\n")
+    end
+  end
 end
